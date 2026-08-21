@@ -1,0 +1,47 @@
+main.yml
+.github/workflows
+name:Déploiement Automatique ACR-NAMU
+
+on:
+  push:
+    branches::
+      - main # Le déploiement se déclenche quand vous poussez sur la branche principale
+
+jobs:
+   build-and-deploy:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name:
+Récupération du code source
+        uses: actions/checkout@v3
+
+        - name:
+Installation de Flutter
+        uses: subosito/flutter-action@v2
+           with:
+             flutter-version:
+'3.x'
+             channel:
+'stable'
+
+      - name:
+Installation des déppendannces
+        run: flutter pub get
+
+     - name:
+Compilation de l'application Web
+       run: flutter build web --release
+
+    - name:
+Déploiement sur le serveur ACR
+      uses: Samkirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: $ {{ secrets.FTP_SERVER }}
+        usernamme: $  {{ secrets.FTP_USERNAME }} 
+        password: $  {{ secrets.FTP_PASSWORD }}
+                               local-dir:  build/web/
+                               server-dir: /var/www/acr-namu/ # Dossier de destination sur votre serveur
+
+       
+     
